@@ -3,16 +3,16 @@ import InlineTextButton from '../components/InlineTextButton';
 import React from 'react';
 import { auth } from "../firebase";
 import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
-import HomeScreen from './HomeScreen'
+import App from '../App'
 
 export default function Login({ navigation, onLoginSuccess  }) {
 
   if (auth.currentUser) {
-    navigation.navigate("HomeScreen");
+    navigation.navigate("Home");
   } else {
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        navigation.navigate("HomeScreen");
+        navigation.navigate("Home");
       } });
   }
 
@@ -25,7 +25,7 @@ export default function Login({ navigation, onLoginSuccess  }) {
       try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         onLoginSuccess();
-        navigation.navigate("HomeScreen", { user: userCredential.user });
+        navigation.navigate("Home");
         setErrorMessage("");
         setEmail("");
         setPassword("");
