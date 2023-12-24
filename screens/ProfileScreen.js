@@ -80,7 +80,7 @@ import { signOut, updatePassword, signInWithEmailAndPassword, deleteUser } from 
 import { CommonActions } from '@react-navigation/native';
 
 
-export default function ManageAccount({ navigation }) {
+export default function ManageAccount({ navigation,setUserLoggedIn }) {
   const [newPassword, setNewPassword] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -89,7 +89,7 @@ export default function ManageAccount({ navigation }) {
   const logout = async () => {
     try {
       await signOut(auth);
-      navigation.navigate("Login");
+      setUserLoggedIn(false)
     } catch (error) {
       setErrorMessage(error.message);
     }
