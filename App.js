@@ -17,16 +17,43 @@ import LoginScreen from './screens/Login';
 
 import SignUpScreen from './screens/SignUp';
 import ResetPasswordScreen from './screens/ResetPassword';
+import HotelScreen from './screens/HotelsScreen';
+import ReservationScreen from './components/ReservationScreen';
 
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
+// const Reservation = () =>{
+  
+// }
+
 const App = () => {
   const [userLoggedIn, setUserLoggedIn] = useState(false);
 
-  const onLoginSuccess = () => {
-    setUserLoggedIn(true);
+  const HotelStack = () => {
+    return (
+      <Stack.Navigator>
+        <Stack.Screen
+          name="Hotels"
+          options={{
+            headerShown:false,
+            title: "Hotels",
+            presentation: "transparentModal",
+          }}
+          component={HotelScreen}
+        />
+       
+        <Stack.Screen
+          name="Reservation"
+          options={{
+            title: "Make a reservation",
+            // presentation: "transparentModal",
+          }}
+          component={ReservationScreen}
+        />
+      </Stack.Navigator>
+    );
   };
 
   return (
@@ -37,7 +64,7 @@ const App = () => {
             name="Login"
             options={{ headerShown: false }}
           >
-            {(props) => <LoginScreen {...props} onLoginSuccess={onLoginSuccess} />}
+            {(props) => <LoginScreen {...props}  setUserLoggedIn={setUserLoggedIn} />}
           </Stack.Screen>
           <Stack.Screen
             name="SignUp"
@@ -63,7 +90,7 @@ const App = () => {
           />
           <Tab.Screen
             name="Hotels"
-            component={HotelsScreen}
+            component={HotelStack}
             options={{
               tabBarIcon: ({ color, size }) => (
                 <FontAwesome5 name="hotel" color={color} size={size} />
@@ -89,16 +116,16 @@ const App = () => {
                 ),
               }}
             />
-         
-          <Tab.Screen
+         <Tab.Screen
             name="Profile"
-            component={ProfileScreen}
             options={{
               tabBarIcon: ({ color, size }) => (
                 <Ionicons name="person" color={color} size={size} />
               ),
-            }}
-          />
+            }}          >
+            {(props) => <ProfileScreen {...props} setUserLoggedIn={setUserLoggedIn} />}
+          </Tab.Screen>
+         
         </Tab.Navigator>
       )}
     </NavigationContainer>

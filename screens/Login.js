@@ -5,30 +5,30 @@ import { auth } from "../firebase";
 import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 import App from '../App'
 
-export default function Login({ navigation, onLoginSuccess  }) {
+export default function Login({ navigation, setUserLoggedIn  }) {
 
   if (auth.currentUser) {
-    navigation.navigate("Home");
+    setUserLoggedIn(true);
+
   } else {
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        navigation.navigate("Home");
+        setUserLoggedIn(true);
       } });
   }
 
-  let [errorMessage, setErrorMessage] = React.useState("");
-  let [email, setEmail] = React.useState("");
-  let [password, setPassword] = React.useState("");
+  const[errorMessage, setErrorMessage] = React.useState("");
+  const[email, setEmail] = React.useState("");
+  const[password, setPassword] = React.useState("");
 
   let login = async () => {
     if (email !== "" && password !== "") {
       try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        onLoginSuccess();
-        navigation.navigate("Home");
         setErrorMessage("");
         setEmail("");
         setPassword("");
+        setUserLoggedIn(true);
       } catch (error) {
         setErrorMessage(error.message);
       }
