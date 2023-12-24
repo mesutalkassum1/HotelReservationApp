@@ -198,7 +198,7 @@ const HotelScreen = ({ navigation }) => {
       </Card.Content>
       <Card.Actions>
         {/* <Button onPress={() => navigation.navigate('Detail', { hotel: item })}>Detay</Button> */}
-        <Button  onPress={() => navigation.navigate('ReservationScreen', { hotel: item })}>Reservation</Button>
+        <Button  onPress={() => navigation.navigate('Reservation', { hotel: item })}>Reservation</Button>
       </Card.Actions>
     </Card>
   );
