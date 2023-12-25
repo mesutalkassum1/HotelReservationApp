@@ -5,7 +5,6 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import HomeScreen from './screens/HomeScreen';
-import HotelsScreen from './screens/HotelsScreen';
 import ReservationsScreen from './screens/ReservationsScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import AdminScreen from './screens/AdminScreen';
@@ -17,16 +16,12 @@ import LoginScreen from './screens/Login';
 
 import SignUpScreen from './screens/SignUp';
 import ResetPasswordScreen from './screens/ResetPassword';
-import HotelScreen from './screens/HotelsScreen';
+import HotelsScreen from './screens/HotelsScreen';
 import ReservationScreen from './components/ReservationScreen';
 
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
-
-// const Reservation = () =>{
-  
-// }
 
 const App = () => {
   const [userLoggedIn, setUserLoggedIn] = useState(false);
@@ -41,7 +36,7 @@ const App = () => {
             title: "Hotels",
             presentation: "transparentModal",
           }}
-          component={HotelScreen}
+          component={HotelsScreen}
         />
        
         <Stack.Screen
@@ -83,6 +78,7 @@ const App = () => {
             name="Home"
             component={HomeScreen}
             options={{
+              headerShown:false,
               tabBarIcon: ({ color, size }) => (
                 <Ionicons name="home" color={color} size={size} />
               ),
@@ -92,6 +88,7 @@ const App = () => {
             name="Hotels"
             component={HotelStack}
             options={{
+              headerShown:false,
               tabBarIcon: ({ color, size }) => (
                 <FontAwesome5 name="hotel" color={color} size={size} />
               ),
@@ -101,6 +98,7 @@ const App = () => {
             name="Reservations"
             component={ReservationsScreen}
             options={{
+              headerShown:false,
               tabBarIcon: ({ color, size }) => (
                 <FontAwesome5 name="calendar-alt" color={color} size={size} />
               ),
@@ -111,6 +109,7 @@ const App = () => {
               name="Admin"
               component={AdminScreen}
               options={{
+                headerShown:false,
                 tabBarIcon: ({ color, size }) => (
                   <MaterialIcons name="admin-panel-settings" color={color} size={size} />
                 ),
@@ -119,6 +118,7 @@ const App = () => {
          <Tab.Screen
             name="Profile"
             options={{
+              headerShown:false,
               tabBarIcon: ({ color, size }) => (
                 <Ionicons name="person" color={color} size={size} />
               ),
