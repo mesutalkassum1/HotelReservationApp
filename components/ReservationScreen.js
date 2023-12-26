@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, TextInput, Button, StyleSheet } from 'react-native';
-import { Calendar } from 'react-native-calendars';
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { collection, doc, setDoc } from 'firebase/firestore';
 
-import { database } from '../firebase';
+import { db } from '../firebase';
 
 const ReservationScreen = ({ route }) => {
   const { hotel } = route.params;
@@ -12,46 +12,50 @@ const ReservationScreen = ({ route }) => {
   const [fullName, setFullName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [markedDates, setMarkedDates] = useState({});
 
   const handleReservationConfirmation = async () => {
     try {
-      const reservationRef = database.ref('reservations');
-      const newReservationRef = reservationRef.push();
-
+      const reservationCollectionRef = collection(db, 'reservations');
+      const newReservationRef = doc(reservationCollectionRef);
+  
       const reservationData = {
         hotelId: hotel.id,
         hotelTitle: hotel.title,
-        selectedDate,
+        selectedDate: selectedDate.toISOString().split('T')[0],
         numberOfNights,
         fullName,
         phoneNumber,
       };
-
-      await newReservationRef.set(reservationData);
-
-      console.log('Rezervasyon başarıyla kaydedildi!');
+  
+      await setDoc(newReservationRef, reservationData);
+  
+      console.log('Reservation successfully saved!');
     } catch (error) {
       console.error('Error saving reservation:', error);
     }
   };
-
+  
   const showDatepicker = () => {
     setShowDatePicker(true);
   };
 
-  const onDateChange = (event, date) => {
+  const onDateChange = (event, selectedDate) => {
     setShowDatePicker(false);
-    if (date) {
-      setSelectedDate(date);
+    if (selectedDate) {
+      setSelectedDate(selectedDate);
     }
   };
 
-  const onDayPress = (day) => {
-    // Kullanıcının seçtiği tarih aralığına işaret koymak için
-    setMarkedDates({
-      [day.dateString]: { selected: true, marked: true, selectedColor: 'blue' },
-    });
+  const handleFullNameChange = (text) => {
+    // Allow only letters and spaces
+    const sanitizedText = text.replace(/[^A-Za-z ]/g, '');
+    setFullName(sanitizedText);
+  };
+
+  const handlePhoneNumberChange = (text) => {
+    // Allow only numbers
+    const sanitizedText = text.replace(/[^0-9]/g, '');
+    setPhoneNumber(sanitizedText);
   };
 
   return (
@@ -74,11 +78,11 @@ const ReservationScreen = ({ route }) => {
         />
       )}
 
-      {/* Takvim (calendar) bileşeni */}
-      <Calendar
-        current={selectedDate.toISOString().split('T')[0]}
-        markedDates={markedDates}
-        onDayPress={onDayPress}
+      <TextInput
+        style={styles.input}
+        placeholder="Selected Date"
+        value={selectedDate.toISOString().split('T')[0]}
+        editable={false}
       />
 
       <TextInput
@@ -93,7 +97,7 @@ const ReservationScreen = ({ route }) => {
         style={styles.input}
         placeholder="Full Name"
         value={fullName}
-        onChangeText={(text) => setFullName(text)}
+        onChangeText={handleFullNameChange}
       />
 
       <TextInput
@@ -101,7 +105,7 @@ const ReservationScreen = ({ route }) => {
         placeholder="Phone Number"
         keyboardType="phone-pad"
         value={phoneNumber}
-        onChangeText={(text) => setPhoneNumber(text)}
+        onChangeText={handlePhoneNumberChange}
       />
 
       <Button title="Confirm Reservation" onPress={handleReservationConfirmation} />
@@ -114,24 +118,27 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     justifyContent: 'center',
-    backgroundColor: '#f7f7f7',
+    backgroundColor: '#ecf0f1',
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 16,
-    color: '#333',
+    color: '#3498db',
+    textAlign: 'center',
   },
   subtitle: {
-    fontSize: 18,
+    fontSize: 20,
     marginBottom: 24,
     color: '#555',
+    textAlign: 'center',
   },
   datePickerButton: {
     backgroundColor: '#3498db',
     padding: 12,
     borderRadius: 8,
     marginBottom: 16,
+    alignSelf: 'center',
   },
   datePickerButtonText: {
     color: '#fff',
@@ -140,11 +147,12 @@ const styles = StyleSheet.create({
   },
   input: {
     height: 40,
-    borderColor: '#ccc',
+    borderColor: '#3498db',
     borderWidth: 1,
     marginBottom: 16,
     paddingHorizontal: 8,
     backgroundColor: '#fff',
+    borderRadius: 8,
   },
 });
 
