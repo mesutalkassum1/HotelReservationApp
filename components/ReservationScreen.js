@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, TextInput, Button, StyleSheet } from 'react-native';
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { collection, doc, setDoc } from 'firebase/firestore';
+import Modal from 'react-native-modal';
 
-import { db } from '../firebase';
+import { db, auth } from '../firebase';
+import { useNavigation } from '@react-navigation/native';
 
 const ReservationScreen = ({ route }) => {
   const { hotel } = route.params;
@@ -12,13 +14,23 @@ const ReservationScreen = ({ route }) => {
   const [fullName, setFullName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [isModalVisible, setModalVisible] = useState(false);
+  const navigation = useNavigation();
+
+  const toggleModal = () => {
+    setModalVisible(!isModalVisible);
+  };
 
   const handleReservationConfirmation = async () => {
     try {
+      // Assuming the user is authenticated and user ID is available
+      const userId = auth.currentUser.uid;
+  
       const reservationCollectionRef = collection(db, 'reservations');
       const newReservationRef = doc(reservationCollectionRef);
   
       const reservationData = {
+        userId: userId,
         hotelId: hotel.id,
         hotelTitle: hotel.title,
         selectedDate: selectedDate.toISOString().split('T')[0],
@@ -29,7 +41,8 @@ const ReservationScreen = ({ route }) => {
   
       await setDoc(newReservationRef, reservationData);
   
-      console.log('Reservation successfully saved!');
+      // Show the thank you message modal
+      toggleModal();
     } catch (error) {
       console.error('Error saving reservation:', error);
     }
@@ -56,6 +69,11 @@ const ReservationScreen = ({ route }) => {
     // Allow only numbers
     const sanitizedText = text.replace(/[^0-9]/g, '');
     setPhoneNumber(sanitizedText);
+  };
+
+  const navigateToHome = () => {
+    // Navigate to HomeScreen after modal is closed
+    navigation.navigate('Home');
   };
 
   return (
@@ -109,6 +127,14 @@ const ReservationScreen = ({ route }) => {
       />
 
       <Button title="Confirm Reservation" onPress={handleReservationConfirmation} />
+
+      {/* Thank you message modal */}
+      <Modal isVisible={isModalVisible} onBackdropPress={navigateToHome}>
+        <View style={styles.modalContainer}>
+          <Text style={styles.modalText}>Thank you for your reservation!</Text>
+          <Button title="Close" onPress={toggleModal} />
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -153,6 +179,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     backgroundColor: '#fff',
     borderRadius: 8,
+  },
+  // Modal styles
+  modalContainer: {
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  modalText: {
+    fontSize: 18,
+    marginBottom: 16,
+    textAlign: 'center',
   },
 });
 
