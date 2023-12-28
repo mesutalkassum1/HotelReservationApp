@@ -18,6 +18,8 @@ import ResetPasswordScreen from './screens/ResetPassword';
 import HotelsScreen from './screens/HotelsScreen';
 import ReservationScreen from './components/ReservationScreen';
 import EditReservation from './components/EditReservation'
+import { FavoritesProvider } from './components/FavoritesContext';
+import FavoritesScreen from './screens/FavoritesScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -51,26 +53,34 @@ const App = () => {
 
   const HotelStack = () => {
     return (
-      <Stack.Navigator>
+      <FavoritesProvider>  
+        <Stack.Navigator>
+          <Stack.Screen
+            name="Hotelss"
+            options={{
+              // headerShown:false,
+              title: "Hotels",
+              presentation: "transparentModal",
+            }}
+            component={HotelsScreen}
+          />
         <Stack.Screen
-          name="Hotels"
-          options={{
-            // headerShown:false,
-            title: "Hotels",
-            presentation: "transparentModal",
-          }}
-          component={HotelsScreen}
+          name="FavoritesScreen"
+            options={{
+              title: "Favorites",
+            }}
+            component={FavoritesScreen}
         />
-       
-        <Stack.Screen
-          name="Reservation"
-          options={{
-            title: "Make a reservation",
-            // presentation: "transparentModal",
-          }}
-          component={ReservationScreen}
-        />
-      </Stack.Navigator>
+          <Stack.Screen
+            name="Reservation"
+            options={{
+              title: "Make a reservation",
+              // presentation: "transparentModal",
+            }}
+            component={ReservationScreen}
+          />
+        </Stack.Navigator>
+      </FavoritesProvider>
     );
   };
 
