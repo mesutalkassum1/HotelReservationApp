@@ -7,6 +7,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { FontAwesome5 } from '@expo/vector-icons'; 
 import { MaterialIcons } from '@expo/vector-icons';
+import { auth } from "./firebase"; 
+
 
 import ProfileScreen from './screens/ProfileScreen';
 import AdminScreen from './screens/AdminScreen';
@@ -89,6 +91,7 @@ const App = () => {
       {!userLoggedIn ? (
         <Stack.Navigator>
           <Stack.Screen
+          
             name="Login"
             options={{ headerShown: false }}
           >
@@ -97,7 +100,9 @@ const App = () => {
           <Stack.Screen
             name="SignUp"
             component={SignUpScreen}
-            options={{ title: 'Sign Up' }}
+            options={{
+              headerShown:false,
+              title: 'Sign Up' }}
           />
           <Stack.Screen
             name="ResetPassword"
@@ -138,31 +143,34 @@ const App = () => {
             }}
           />
 
-            <Tab.Screen
-              name="Admin"
-              component={AdminScreen}
-              options={{
-                headerShown:false,
-                tabBarIcon: ({ color, size }) => (
-                  <MaterialIcons name="admin-panel-settings" color={color} size={size} />
-                ),
-              }}
-            />
-         <Tab.Screen
-            name="Profile"
+{auth.currentUser?.email === "masudkasom1@gmail.com" && (
+          <Tab.Screen
+            name="Admin"
+            component={AdminScreen}
             options={{
-              headerShown:false,
+              headerShown: false,
               tabBarIcon: ({ color, size }) => (
-                <Ionicons name="person" color={color} size={size} />
+                <MaterialIcons name="admin-panel-settings" color={color} size={size} />
               ),
-            }}          >
-            {(props) => <ProfileScreen {...props} setUserLoggedIn={setUserLoggedIn} />}
-          </Tab.Screen>
-         
-        </Tab.Navigator>
-      )}
-    </NavigationContainer>
-  );
+            }}
+          />
+        )}
+
+        <Tab.Screen
+          name="Profile"
+          options={{
+            headerShown: false,
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="person" color={color} size={size} />
+            ),
+          }}
+        >
+          {(props) => <ProfileScreen {...props} setUserLoggedIn={setUserLoggedIn} />}
+        </Tab.Screen>
+      </Tab.Navigator>
+    )}
+  </NavigationContainer>
+);
 };
 
 export default App;

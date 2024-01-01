@@ -1,7 +1,8 @@
 import { Text, View, TextInput, Button, KeyboardAvoidingView, Platform } from 'react-native';
 import InlineTextButton from '../components/InlineTextButton';
 import React from 'react';
-import { auth } from "../firebase";
+import { auth, db } from "../firebase";
+import { collection, addDoc, setDoc } from 'firebase/firestore';
 import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 
 
@@ -12,10 +13,12 @@ export default function SignUp({ navigation }) {
   let [password, setPassword] = React.useState("");
   let [confirmPassword, setConfirmPassword] = React.useState("");
   let [validationMessage, setValidationMessage] = React.useState("");
+  let [name, setName] = React.useState("");
+
 
   let validateAndSet = (value, valueToCompare, setValue) => {
     if (value !== valueToCompare) {
-      setValidationMessage("Şifreler eşleşmiyor!");
+      setValidationMessage("Şifreler veya email eşleşmiyor!");
     } else {
       setValidationMessage("");
     }
@@ -24,18 +27,40 @@ export default function SignUp({ navigation }) {
   };
 
   let signUp = () => {
-    if (password === confirmPassword) {
+    if (password === confirmPassword && email && name) {
       createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        sendEmailVerification(auth.currentUser);
-        onLoginSuccess();
-        navigation.navigate("HomeScreen", { user: userCredential.user });
-      })
-      .catch((error) => {
-        setValidationMessage(error.message);
-      });
+        .then((userCredential) => {
+          // Save additional user information to the database
+          saveUserInformation(userCredential.user);
+  
+          sendEmailVerification(auth.currentUser);
+          onLoginSuccess();
+          navigation.navigate("HomeScreen", { user: userCredential.user });
+        })
+        .catch((error) => {
+          setValidationMessage(error.message);
+        });
     }
-  }
+  };
+
+  let saveUserInformation = async (user) => {
+    try {
+      // Assuming the user is authenticated and user ID is available
+      const userId = user.uid;
+
+      // Create a reference to the "users" collection
+      const usersCollectionRef = collection(db, 'users');
+
+      // Add a new document with a generated ID
+      await addDoc(usersCollectionRef, {
+        userId: userId,
+        email: email,
+        name: name,
+      });
+    } catch (error) {
+      console.error('Error saving user information:', error);
+    }
+  };
 
   return (
     <KeyboardAvoidingView
@@ -43,8 +68,15 @@ export default function SignUp({ navigation }) {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
     >
-      <Text style={styles.header}>Üye ol</Text>
+      <Text style={styles.header}>Sign Up</Text>
       <Text style={styles.errorText}>{validationMessage}</Text>
+      <TextInput
+        style={styles.input}
+        placeholder='Full Name'
+        placeholderTextColor="#BEBEBE"
+        value={name}
+        onChangeText={setName}
+      />
       <TextInput
         style={styles.input}
         placeholder='Email'
@@ -54,7 +86,7 @@ export default function SignUp({ navigation }) {
       />
       <TextInput
         style={styles.input}
-        placeholder='Şifre'
+        placeholder='Password'
         placeholderTextColor="#BEBEBE"
         secureTextEntry={true}
         value={password}
@@ -62,20 +94,20 @@ export default function SignUp({ navigation }) {
       />
       <TextInput
         style={styles.input}
-        placeholder='Şifrenizi tekrar giriniz'
+        placeholder='Enter Password Again'
         placeholderTextColor="#BEBEBE"
         secureTextEntry={true}
         value={confirmPassword}
         onChangeText={(value) => validateAndSet(value, password, setConfirmPassword)}
       />
       <View style={styles.rowContainer}>
-        <Text style={styles.lightText}>Hesabım var </Text>
+        <Text style={styles.lightText}>Have account already? </Text>
         <InlineTextButton text="Login" onPress={() => navigation.popToTop()} />
       </View>
-      <Button title="Kayıt ol" onPress={signUp} color="#f7b267" />
+      <Button title="Sign Up" onPress={signUp} color="#f7b267" />
     </KeyboardAvoidingView>
   );
-}
+}  
 
 const styles = {
   container: {
