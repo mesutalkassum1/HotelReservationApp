@@ -213,89 +213,89 @@ const AdminScreen = () => {
     fetchUsers();
   }, [db]);
 
-  const handleDeleteUser = async (userId, userEmail) => {
-    try {
-      const confirmDelete = await promptConfirmation();
-      if (confirmDelete) {
-        console.log('Deleting reservations and user:', userId);
-        // Delete user's reservations from Firestore (reservations collection)
-        await deleteReservations(userId);
+  // const handleDeleteUser = async (userId, userEmail) => {
+  //   try {
+  //     const confirmDelete = await promptConfirmation();
+  //     if (confirmDelete) {
+  //       console.log('Deleting reservations and user:', userId);
+  //       // Delete user's reservations from Firestore (reservations collection)
+  //       await deleteReservations(userId);
   
-        // Delete user's data from Firestore (users collection)
-        await deleteUser(userId);
-      }
-    } catch (error) {
-      console.error('Error deleting user:', error);
-    }
-  };
+  //       // Delete user's data from Firestore (users collection)
+  //       await deleteUser(userId);
+  //     }
+  //   } catch (error) {
+  //     console.error('Error deleting user:', error);
+  //   }
+  // };
   
 
-  const deleteReservations = async (userId) => {
-    try {
-      console.log('Deleting reservations for user:', userId);
+  // const deleteReservations = async (userId) => {
+  //   try {
+  //     console.log('Deleting reservations for user:', userId);
   
-      const reservationsCollectionRef = collection(db, 'reservations');
-      const reservationsQuerySnapshot = await getDocs(query(reservationsCollectionRef, where('userId', '==', userId)));
+  //     const reservationsCollectionRef = collection(db, 'reservations');
+  //     const reservationsQuerySnapshot = await getDocs(query(reservationsCollectionRef, where('userId', '==', userId)));
   
-      const deleteReservationsPromises = reservationsQuerySnapshot.docs.map(async (reservationDoc) => {
-        console.log('Deleting reservation:', reservationDoc.id);
-        await deleteDoc(reservationDoc.ref);
-      });
+  //     const deleteReservationsPromises = reservationsQuerySnapshot.docs.map(async (reservationDoc) => {
+  //       console.log('Deleting reservation:', reservationDoc.id);
+  //       await deleteDoc(reservationDoc.ref);
+  //     });
   
-      await Promise.all(deleteReservationsPromises);
+  //     await Promise.all(deleteReservationsPromises);
   
-      console.log('Reservations deleted successfully.');
-    } catch (error) {
-      console.error('Error deleting reservations:', error);
-    }
-  };
+  //     console.log('Reservations deleted successfully.');
+  //   } catch (error) {
+  //     console.error('Error deleting reservations:', error);
+  //   }
+  // };
 
-  const deleteUser = async (userId) => {
-    try {
-      const userDocRef = doc(collection(db, 'users'), userId);
-      await deleteDoc(userDocRef);
+  // const deleteUser = async (userId) => {
+  //   try {
+  //     const userDocRef = doc(collection(db, 'users'), userId);
+  //     await deleteDoc(userDocRef);
 
-      // Update the users state to reflect the changes
-      const updatedUsers = users.filter((user) => user.id !== userId);
-      setUsers(updatedUsers);
-    } catch (error) {
-      console.error('Error deleting user:', error);
-    }
-  };
+  //     // Update the users state to reflect the changes
+  //     const updatedUsers = users.filter((user) => user.id !== userId);
+  //     setUsers(updatedUsers);
+  //   } catch (error) {
+  //     console.error('Error deleting user:', error);
+  //   }
+  // };
 
-  const promptConfirmation = () => {
-    return new Promise((resolve) => {
-      Alert.alert(
-        'Confirm Deletion',
-        'Are you sure you want to delete this user?',
-        [
-          {
-            text: 'Cancel',
-            onPress: () => resolve(false),
-            style: 'cancel',
-          },
-          {
-            text: 'Delete',
-            onPress: () => resolve(true),
-            style: 'destructive',
-          },
-        ],
-        { cancelable: false }
-      );
-    });
-  };
+  // const promptConfirmation = () => {
+  //   return new Promise((resolve) => {
+  //     Alert.alert(
+  //       'Confirm Deletion',
+  //       'Are you sure you want to delete this user?',
+  //       [
+  //         {
+  //           text: 'Cancel',
+  //           onPress: () => resolve(false),
+  //           style: 'cancel',
+  //         },
+  //         {
+  //           text: 'Delete',
+  //           onPress: () => resolve(true),
+  //           style: 'destructive',
+  //         },
+  //       ],
+  //       { cancelable: false }
+  //     );
+  //   });
+  // };
 
   const renderItem = ({ item }) => (
     <View style={styles.userItem}>
       <Text style={styles.userId}>{`User ID: ${item.id}`}</Text>
       <Text style={styles.userInfo}>{`Email: ${item.email}`}</Text>
       <Text style={styles.userInfo}>{`Name: ${item.name}`}</Text>
-      <TouchableOpacity
+      {/* <TouchableOpacity
         style={styles.deleteButton}
         onPress={() => handleDeleteUser(item.id, item.email)}
       >
         <Text style={styles.deleteButtonText}>Delete User</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </View>
   );
 

@@ -159,7 +159,7 @@ const App = () => {
         <Tab.Screen
           name="Profile"
           options={{
-            headerShown: false,
+            // headerShown: false,
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="person" color={color} size={size} />
             ),

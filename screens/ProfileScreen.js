@@ -1,41 +1,40 @@
 import React, { useState } from 'react';
-import { Button, View, TextInput, Text, StyleSheet } from 'react-native';
-import { auth, db } from "../firebase"; 
+import { View, Text, Button, StyleSheet, TouchableOpacity , TextInput} from 'react-native';
+import { auth, db } from "../firebase";
 import { signOut, updatePassword, signInWithEmailAndPassword, deleteUser } from 'firebase/auth';
-import { CommonActions } from '@react-navigation/native';
 import { doc, query, collection, getDocs, deleteDoc, where } from 'firebase/firestore';
+import { Entypo } from '@expo/vector-icons'; // Eklediğimiz icon seti
 
-export default function ManageAccount({ navigation,setUserLoggedIn }) {
-  const [newPassword, setNewPassword] = useState("");
+export default function ManageAccount({ navigation, setUserLoggedIn }) {
+  // const [newPassword, setNewPassword] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-
 
   const logout = async () => {
     try {
       await signOut(auth);
-      setUserLoggedIn(false)
+      setUserLoggedIn(false);
     } catch (error) {
       setErrorMessage(error.message);
     }
   };
 
-  const updateUserPassword = () => {
-    signInWithEmailAndPassword(auth, auth.currentUser.email, currentPassword)
-      .then((userCredential) => {
-        const user = userCredential.user;
-        updatePassword(user, newPassword).then(() => {
-          setNewPassword("");
-          setErrorMessage("");
-          setCurrentPassword("");
-        }).catch((error) => {
-          setErrorMessage(error.message);
-        });
-      })
-      .catch((error) => {
-        setErrorMessage(error.message);
-      });
-  };
+  // const updateUserPassword = () => {
+  //   signInWithEmailAndPassword(auth, auth.currentUser.email, currentPassword)
+  //     .then((userCredential) => {
+  //       const user = userCredential.user;
+  //       updatePassword(user, newPassword).then(() => {
+  //         setNewPassword("");
+  //         setErrorMessage("");
+  //         setCurrentPassword("");
+  //       }).catch((error) => {
+  //         setErrorMessage(error.message);
+  //       });
+  //     })
+  //     .catch((error) => {
+  //       setErrorMessage(error.message);
+  //     });
+  // };
 
   const deleteUserAndReservation = async () => {
     try {
@@ -63,9 +62,6 @@ export default function ManageAccount({ navigation,setUserLoggedIn }) {
         await deleteDoc(doc.ref);
       });
 
-
-
-
       // Query reservations collection for reservations by this user
       const usersQuery = query(collection(db, 'users'), where('userId', '==', userId));
       const usersSnapshot = await getDocs(usersQuery);
@@ -89,8 +85,16 @@ export default function ManageAccount({ navigation,setUserLoggedIn }) {
     }
   };
 
+
   return (
     <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.headerText}>{auth.currentUser.email}</Text>
+        <TouchableOpacity onPress={logout}>
+          <Entypo name="log-out" size={24} color="black" />
+        </TouchableOpacity>
+      </View>
+
       <Text style={styles.errorText}>{errorMessage}</Text>
       <TextInput 
         style={styles.input} 
@@ -98,15 +102,10 @@ export default function ManageAccount({ navigation,setUserLoggedIn }) {
         value={currentPassword}
         secureTextEntry={true}
         onChangeText={setCurrentPassword} />
-      <TextInput 
-        style={styles.input} 
-        placeholder='New Password'
-        value={newPassword}
-        secureTextEntry={true}
-        onChangeText={setNewPassword} />
-      <Button title="Update Password" onPress={updateUserPassword} />
-      <Button title="Delete User" onPress={deleteUserAndReservation} />
-      <Button title="Logout" onPress={logout} />
+      <Button 
+        title="Delete Account" 
+        onPress={deleteUserAndReservation}
+        style={styles.deleteButton} />
     </View>
   );
 }
@@ -114,22 +113,47 @@ export default function ManageAccount({ navigation,setUserLoggedIn }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
     backgroundColor: '#f0f0f0',
     padding: 20,
   },
-  input: {
-    height: 40,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 5,
-    marginBottom: 10,
-    paddingLeft: 10,
-    width: '100%',
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  headerText: {
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   errorText: {
     color: 'red',
     marginBottom: 10,
   },
+  input: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginBottom: 10,
+    padding: 8,
+  },
+  deleteButton: {
+    backgroundColor: 'red',
+    color: 'white',
+    padding: 10,
+    borderRadius: 5,
+    textAlign: 'center',
+  },
 });
+
+
+
+
+
+
+// style={styles.input} 
+// placeholder='New Password'
+// value={newPassword}
+// secureTextEntry={true}
+// onChangeText={setNewPassword} />
+// <Button title="Update Password" onPress={updateUserPassword} />
