@@ -44,7 +44,7 @@ export default function Login({ navigation, setUserLoggedIn  }) {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
     >
-      <Text style={styles.header}>Giriş</Text>
+      <Text style={styles.header}>Login</Text>
       <Text style={styles.errorText}>{errorMessage}</Text>
       <TextInput
         style={styles.input}
@@ -62,11 +62,11 @@ export default function Login({ navigation, setUserLoggedIn  }) {
         onChangeText={(value)=>setPassword(value)}
       />
       <View style={styles.rowContainer}>
-        <Text style={styles.lightText}>Hesabım Yok </Text>
+        <Text style={styles.lightText}>I don't have account </Text>
         <InlineTextButton text="Sign Up" onPress={() => navigation.navigate("SignUp")} />
       </View>
       <View style={styles.rowContainer}>
-        <Text style={styles.lightText}>Şifremi Unuttum </Text>
+        <Text style={styles.lightText}>Forget Password </Text>
         <InlineTextButton text="Reset" onPress={() => navigation.navigate("ResetPassword")} />
       </View>
       <Button title="Login" onPress={login} color="#f7b267" />

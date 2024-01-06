@@ -9,6 +9,26 @@ export default function ManageAccount({ navigation, setUserLoggedIn }) {
   // const [newPassword, setNewPassword] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [userName, setUserName] = useState(""); // Eklenen kısım
+
+  useEffect(() => {
+    // Firestore'dan kullanıcı adını çekme
+    const fetchUserData = async () => {
+      try {
+        const userRef = doc(db, 'users', auth.currentUser.uid);
+        const userSnapshot = await getDocs(userRef);
+        if (userSnapshot.exists()) {
+          const userData = userSnapshot.data();
+          setUserName(userData.name); // Kullanıcı adını ayarla
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
 
   const logout = async () => {
     try {
@@ -89,26 +109,25 @@ export default function ManageAccount({ navigation, setUserLoggedIn }) {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerText}>{auth.currentUser.email}</Text>
-        <TouchableOpacity onPress={logout}>
-          <Entypo name="log-out" size={24} color="black" />
-        </TouchableOpacity>
+        <Text style={styles.headerText}>{userName}</Text>
+        {/* ... (eski kod devam ediyor) */}
       </View>
 
       <Text style={styles.errorText}>{errorMessage}</Text>
-      <TextInput 
-        style={styles.input} 
+      <TextInput
+        style={styles.input}
         placeholder='Current Password'
         value={currentPassword}
         secureTextEntry={true}
         onChangeText={setCurrentPassword} />
-      <Button 
-        title="Delete Account" 
+      <Button
+        title="Delete Account"
         onPress={deleteUserAndReservation}
         style={styles.deleteButton} />
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
